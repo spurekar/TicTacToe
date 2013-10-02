@@ -9,9 +9,10 @@ def print_board(board):
 	print ("     " + board[4] + ' | ' + board[5] + ' | ' + board[6])
 	print "     ---------"
 	print ("     " + board[7] + ' | ' + board[8] + ' | ' + board[9])
+	print "\n"
 
 #This function handles the user's move
-def user_move():
+def user_move(board):
 	while True:
 		#ask user for cell
 		cell = raw_input("Pick a cell to play (1-9): ")
@@ -21,7 +22,10 @@ def user_move():
 			cell = int(cell)
 			if (cell >= 1 and cell <= 9):
 				#return cell number
-				return cell
+				if(board[cell] == ' '):
+					return cell
+				else:
+					print "Invalid input"
 			else:
 				print "Invalid input"
 		except ValueError:
@@ -53,7 +57,23 @@ def check_win(board):
 		return board[7]
 	else:
 		return ' '
+
+#This function picks the most optimal move for the computer
+def comp_move(board):
+	#find first empty cell
+	cell = blank_cell(board)
+
+	return cell
 	
+	#TODO
+
+
+#This function returns an empty cell if possible, otherwise indicate a full board
+def blank_cell(board):
+	for i in range(1,10):
+		if (board[i] == ' '):
+			return i
+	return 0
 
 #Main
 
@@ -66,7 +86,6 @@ print "     ---------"
 print ("     " + '7' + ' | ' + '8' + ' | ' + '9')
 
 board = [' '] * 10
-movecount = 0
 
 #Create graphical board for user
 print_board(board)
@@ -74,25 +93,37 @@ print_board(board)
 while True:
 
 	#Handle human move
-	cell = user_move()
-	movecount+= 1
+	cell = user_move(board)
 	board[cell] = 'X'
+	print "\nYou played cell " + str(cell) + "."
 
-	print_board(board)
+	#Check all combinations for a win
+	done = check_win(board)
+	#Exit if the game is over
+		#means done has a winner, or there are no blank cells
+	if (done != ' ' or blank_cell == 0):
+		break
 
 	#Handle computer plays
-	#cell = comp_move()
+	cell = comp_move(board)
+	board[cell] = 'O'
+	print "Computer played cell " + str(cell) + ".\n"
+	
+	print_board(board)
 
 	#Check all combinations for a win
 	done = check_win(board)
 
-
-	print board
+	#TODO delete me later
+	#print board
 
 	#Exit if the game is over
-	if (done != ' ' or movecount == 9):
+		#means done has a winner, or there are no blank cells
+	if (done != ' ' or blank_cell == 0):
 		break
 
+#Show final board
+print_board(board)
 
 if (done != ' '):
 	print "Yay! " + done + " has won the game."
