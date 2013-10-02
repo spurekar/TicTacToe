@@ -60,16 +60,89 @@ def check_win(board):
 
 #This function picks the most optimal move for the computer
 def comp_move(board):
-	#find first empty cell
-	cell = blank_cell(board)
+	#init vars
+	curplayer = 'O'
+	depth = 0 #top of tree
+	
 
-	return cell
+	return poss_move(board)
 	
 	#TODO
 
 
-#This function returns an empty cell if possible, otherwise indicate a full board
-def blank_cell(board):
+#Recursive function (minimax)
+def poss_move(board):
+	
+	optscore = -1
+	optcell = 0
+
+	"""
+	#check if comp won
+	if(check_win(board) == 'O'):
+		score = 1
+	#check if user won
+	elif(check_win(board) == 'X'):
+		score = -1
+	#check if there is a tie
+	elif(check_win(board) == ' ' and full_board == 0):
+		score = 0
+	#check if there is no winner yet
+	else:
+	"""
+	#go through each empty cell
+	for i in range(1,10):
+		if(board[i] != ' '):
+			continue
+		else:
+			#we have an empty cell
+			#inhabit empty cell
+			board[i] = 'O'
+			#score
+			#check if comp won
+			if(check_win(board) == 'O'):
+				score = 1
+			#check if user won
+			elif(check_win(board) == 'X'):
+				score = -1
+			#check if there is a tie
+			else:
+				score = 0
+			#track score
+			if (score > optscore):
+				optscore = score
+				optcell = i
+			#clear same cell
+			board[i] = ' '
+	
+	return optcell
+
+
+	"""
+	#return most optimal cell
+	if (depth == 0 or full_board == 0):
+		return cell
+	if (score < 0)
+		poss_move(depth-1,board,score)
+
+	#find first empty cell
+	cell = full_board(board)
+	if ((depth % 2) == 0):
+		board[cell] = 'X'
+	else:
+		board[cell] = 'O'
+
+	#check if there is a winner
+	if(check_win(board) == 'O'):
+		score = 1
+		poss_move(depth-1,board,score)
+
+	if (depth 
+
+	return cell
+	"""
+
+#This function returns an empty cell if possible, otherwise indicates a full board
+def full_board(board):
 	for i in range(1,10):
 		if (board[i] == ' '):
 			return i
@@ -101,7 +174,7 @@ while True:
 	done = check_win(board)
 	#Exit if the game is over
 		#means done has a winner, or there are no blank cells
-	if (done != ' ' or blank_cell == 0):
+	if (done != ' ' or full_board == 0):
 		break
 
 	#Handle computer plays
@@ -119,7 +192,7 @@ while True:
 
 	#Exit if the game is over
 		#means done has a winner, or there are no blank cells
-	if (done != ' ' or blank_cell == 0):
+	if (done != ' ' or full_board == 0):
 		break
 
 #Show final board
