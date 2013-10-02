@@ -60,23 +60,22 @@ def check_win(board):
 
 #This function picks the most optimal move for the computer
 def comp_move(board):
+	
 	#init vars
-	curplayer = 'O'
-	depth = 0 #top of tree
-	
+	optscore = -1
+	optcell = 0
+	nextturn = 'O'
 
-	return poss_move(board)
-	
-	#TODO
+	#find most optimal cell and score
+	(optcell,optscore) = poss_move(board,optscore,optcell,nextturn)
+
+	#return most optimal move
+	return optcell
 
 
 #Recursive function (minimax)
-def poss_move(board):
+def poss_move(board,optscore,optcell,nextturn):
 	
-	optscore = -1
-	optcell = 0
-
-	"""
 	#check if comp won
 	if(check_win(board) == 'O'):
 		score = 1
@@ -88,33 +87,29 @@ def poss_move(board):
 		score = 0
 	#check if there is no winner yet
 	else:
-	"""
-	#go through each empty cell
-	for i in range(1,10):
-		if(board[i] != ' '):
-			continue
-		else:
-			#we have an empty cell
-			#inhabit empty cell
-			board[i] = 'O'
-			#score
-			#check if comp won
-			if(check_win(board) == 'O'):
-				score = 1
-			#check if user won
-			elif(check_win(board) == 'X'):
-				score = -1
-			#check if there is a tie
+		#go through each empty cell
+		for i in range(1,10):
+			if(board[i] != ' '):
+				continue
 			else:
-				score = 0
+				#we have an empty cell
+				#inhabit empty cell
+				board[i] = nextturn
+				if (nextturn == 'O'):
+					nextturn = 'X'
+				else:
+					nextturn = 'O'
+				#score	
+				(cell,score) = poss_move(board,optscore,optcell,nextturn)
+				
 			#track score
 			if (score > optscore):
 				optscore = score
-				optcell = i
+				optcell = cell
 			#clear same cell
 			board[i] = ' '
 	
-	return optcell
+	return (optcell, optscore)
 
 
 	"""
