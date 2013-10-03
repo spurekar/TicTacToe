@@ -1,5 +1,6 @@
 #!/usr/local/bin/python2.7
 import array
+import string
 
 #This function draws a board given the value of each cell
 def print_board(board):
@@ -59,82 +60,66 @@ def check_win(board):
 		return ' '
 
 #This function picks the most optimal move for the computer
-def comp_move(board):
-	
+def comp_move(board,compicon):
+	"""	
+	#TODO delete next three lines later
+	for i in range(1,10):
+		if (board[i] == ' '):
+			return i
+	"""
 	#init vars
 	optscore = -1
 	optcell = 0
-	nextturn = 'O'
+	curplayer = compicon
 
 	#find most optimal cell and score
-	(optcell,optscore) = poss_move(board,optscore,optcell,nextturn)
+	(optcell) = best_move(board,optscore,optcell,curplayer,compicon)
 
 	#return most optimal move
-	return optcell
+	return int(optcell)
 
 
 #Recursive function (minimax)
-def poss_move(board,optscore,optcell,nextturn):
+def best_move(board,optscore,optcell,curplayer,compicon):
 	
-	#check if comp won
-	if(check_win(board) == 'O'):
-		score = 1
-	#check if user won
-	elif(check_win(board) == 'X'):
-		score = -1
-	#check if there is a tie
-	elif(check_win(board) == ' ' and full_board == 0):
-		score = 0
-	#check if there is no winner yet
-	else:
-		#go through each empty cell
-		for i in range(1,10):
-			if(board[i] != ' '):
-				continue
+	#check for a winner
+	winner = check_win(board)
+	board_full = full_board(board)
+
+	#there is no winner
+	if(winner == ' '):
+		if(board_full == 0):
+		#there's a tie
+			score = 0
+		else:
+			#try each remaining cell in order
+			
+			for i in range(1,10):
+				if (board[i] == ' '):
+					return i
+			#(cell,score) = best_move(board,optscore,optcell,curplayer,compicon)
+			
+			#change player
+			if(curplayer == 'O'):
+				curplayer = 'X'
 			else:
-				#we have an empty cell
-				#inhabit empty cell
-				board[i] = nextturn
-				if (nextturn == 'O'):
-					nextturn = 'X'
-				else:
-					nextturn = 'O'
-				#score	
-				(cell,score) = poss_move(board,optscore,optcell,nextturn)
-				
-			#track score
-			if (score > optscore):
-				optscore = score
-				optcell = cell
-			#clear same cell
-			board[i] = ' '
-	
-	return (optcell, optscore)
+				curplayer = 'O'
 
-
-	"""
-	#return most optimal cell
-	if (depth == 0 or full_board == 0):
-		return cell
-	if (score < 0)
-		poss_move(depth-1,board,score)
-
-	#find first empty cell
-	cell = full_board(board)
-	if ((depth % 2) == 0):
-		board[cell] = 'X'
+	#the winner is opponent
+	elif(winner != curplayer and winner != ' '):
+		if(winner == compicon):
+			score = -1
+		else:
+			score = 1
+	#the winner is me
 	else:
-		board[cell] = 'O'
+		if(winner == compicon):
+			score = 1
+		else:
+			score = -1
 
-	#check if there is a winner
-	if(check_win(board) == 'O'):
-		score = 1
-		poss_move(depth-1,board,score)
+	return optcell
 
-	if (depth 
-
-	return cell
-	"""
 
 #This function returns an empty cell if possible, otherwise indicates a full board
 def full_board(board):
@@ -151,40 +136,58 @@ print ("     " + '1' + ' | ' + '2' + ' | ' + '3')
 print "     ---------"
 print ("     " + '4' + ' | ' + '5' + ' | ' + '6')
 print "     ---------"
-print ("     " + '7' + ' | ' + '8' + ' | ' + '9')
-
-board = [' '] * 10
-
-#Create graphical board for user
-print_board(board)
+print ("     " + '7' + ' | ' + '8' + ' | ' + '9\n')
 
 while True:
+	#Let user decide player
+	print("Player X goes first.")
+	icon = raw_input("Would you like to play as (X) or (O)?: ")
+	icon = icon.upper()
+	if (icon == 'X' or icon == 'O'):
+		#create game board
+		board = [' '] * 10
 
-	#Handle human move
-	cell = user_move(board)
-	board[cell] = 'X'
-	print "\nYou played cell " + str(cell) + "."
-
-	#Check all combinations for a win
-	done = check_win(board)
-	#Exit if the game is over
-		#means done has a winner, or there are no blank cells
-	if (done != ' ' or full_board == 0):
+		#Create graphical board for user
+		print_board(board)
 		break
+	else:
+		print "Invalid input. Try again\n"
 
+if(icon == 'X'):
+	curplayer = 1
+	human = 'X'
+	comp = 'O'
+else:
+	curplayer = 2
+	human = 'O'
+	comp = 'X'
+
+while True:
+#Do this until there is a win or tie
+
+	if(curplayer == 1):
+	#Handle human move
+		
+		cell = user_move(board)
+		board[cell] = human
+		print "\nYou played cell " + str(cell) + ".\n"
+		curplayer = 2
+
+	else:
 	#Handle computer plays
-	cell = comp_move(board)
-	board[cell] = 'O'
-	print "Computer played cell " + str(cell) + ".\n"
-	
-	print_board(board)
+
+		cell = comp_move(board,comp)
+		board[cell] = comp
+		print "\nComputer played cell " + str(cell) + ".\n"
+		curplayer = 1
+
+		print_board(board)
+
+		#Check all combinations for a win
+		done = check_win(board)
 
 	#Check all combinations for a win
 	done = check_win(board)
-
-	#TODO delete me later
-	#print board
-
 	#Exit if the game is over
 		#means done has a winner, or there are no blank cells
 	if (done != ' ' or full_board == 0):
@@ -193,11 +196,12 @@ while True:
 #Show final board
 print_board(board)
 
-if (done != ' '):
-	print "Yay! " + done + " has won the game."
+if (done == human):
+	print "Game over! You have won the game."
+elif (done == comp):
+	print "Game over! The computer has won the game."
 else:
-	print "There was a tie."
-
+	print "Game over! There was a tie."
 
 print "\n"
 
