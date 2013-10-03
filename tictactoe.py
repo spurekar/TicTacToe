@@ -95,15 +95,23 @@ def best_move(board,optscore,optcell,curplayer,compicon):
 			#try each remaining cell in order
 			
 			for i in range(1,10):
+				#temporarily fill in empty cells
 				if (board[i] == ' '):
-					return i
-			#(cell,score) = best_move(board,optscore,optcell,curplayer,compicon)
+					board[i] = curplayer
+				#(cell,score) = best_move(board,optscore,optcell,curplayer,compicon)
 			
+				#evaluate score?
+
+				#clear temp cell
+				board[i] = ' '
+
 			#change player
 			if(curplayer == 'O'):
 				curplayer = 'X'
 			else:
 				curplayer = 'O'
+
+			
 
 	#the winner is opponent
 	elif(winner != curplayer and winner != ' '):
