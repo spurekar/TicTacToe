@@ -3,6 +3,84 @@ import array
 import string
 
 
+###########################################################
+# UNIT TESTS
+
+#RUn unit tests
+def Run_All_Tests():
+	Test_FullBoard()
+	Test_OneMove()
+
+#Test whether full board is recognized
+def Test_FullBoard():
+	#Create board
+	board = [' ','X','O','X','O','X','O','X','O','X']
+	print_board(board)
+
+	#Determine current player
+	curplayer = 'X'
+
+	#Find best move
+	(cell,score) = best_move(board,curplayer)
+
+	#Make sure board returned is correct
+	assert(score == 1)
+	assert(cell == 0)
+
+	#Make sure player lost
+	curplayer = 'O'
+	(cell,score) = best_move(board,curplayer)
+	assert(score == -1)
+	assert(cell == 0)
+
+	#Create tied board
+	board = [' ','X','O','X','O','X','O','O','X','O']
+	print_board(board)
+
+	#Make sure both players return tie
+	curplayer = 'X'
+	(cell,score) = best_move(board,curplayer)
+	assert(score == 0)
+	assert(cell == 0)
+	
+	curplayer = 'O'
+	(cell,score) = best_move(board,curplayer)
+	assert(score == 0)
+	assert(cell == 0)
+
+
+#Test whether one move works
+def Test_OneMove():
+	#Create board
+	board = [' ','X','O','X','O','X','O','O',' ','O']
+	print_board(board)
+	
+	#Determine current player
+	curplayer = 'X'
+	(cell,score) = best_move(board,curplayer)
+	print "the cell is " + str(cell)
+	assert(cell == 8)
+
+	#Find best (only) move
+
+
+	#Make sure board returned is correct
+
+"""
+If one move gets filled in
+	if winner is recognized
+	if loser is recognized
+if board is left empty if there is already a winner
+
+"""
+
+
+
+
+
+###########################################################
+
+
 #This function draws a board given the value of each cell
 def print_board(board):
 	print "This is the current board:\n"
@@ -83,6 +161,7 @@ def comp_move(board,compicon):
 def best_move(board,curplayer):
 
 	cell = 0
+	score = -1
 
 	#check for a winner
 	winner = check_win(board)
@@ -99,30 +178,37 @@ def best_move(board,curplayer):
 			for i in range(1,10):
 				#temporarily fill in empty cells
 				if (board[i] == ' '):
+					#print i
 					board[i] = curplayer
 				
-				#change player
-				if(curplayer == 'O'):
-					curplayer = 'X'
-				else:
-					curplayer = 'O'
+					#change player
+					if(curplayer == 'O'):
+						curplayer = 'X'
+					else:
+						curplayer = 'O'
 				
-				print_board(board)
-				score = best_move(board,curplayer)
-			
-				#create array of cells and scores
-				scoresarray.append(i,-score)
-				
-				print "AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
-				sleep(1)
+					print_board(board)
+					temp,score = best_move(board,curplayer)
+					score = score*(-1)
 
-				#clear temp cell
-				board[i] = ' '
+					#create array of cells and scores
+					tup = (i,score)
+					scoresarray.append(tup)
+					
+					#print scoresarray
+					#print "AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 
+					#clear temp cell
+					board[i] = ' '
+					
+					#print "current cell checked is " + str(i)
 
-			#find optimal in array
+#			print "done checking all cells"
+			#find optimal in array (at current depth)
 			optscore = -1
-			for i in scoresarray:
+			for i in range(0,(len(scoresarray))):
+#				print scoresarray
+#				print "cell is " + str(i) + ", optcell is " + str(cell) + ", score is " + str(score) + ",optscore is " + str(optscore)
 				if (scoresarray[i][1] >= optscore):
 					optscore = scoresarray[i][1]
 					cell = scoresarray[i][0]	
@@ -153,6 +239,10 @@ print "     ---------"
 print ("     " + '4' + ' | ' + '5' + ' | ' + '6')
 print "     ---------"
 print ("     " + '7' + ' | ' + '8' + ' | ' + '9\n')
+
+
+Run_All_Tests()
+
 
 while True:
 	#Let user decide player
@@ -208,7 +298,6 @@ while True:
 		#means done has a winner, or there are no blank cells
 	if (done != ' ' or full_board == 0):
 		break
-
 #Show final board
 print_board(board)
 
@@ -220,4 +309,3 @@ else:
 	print "Game over! There was a tie."
 
 print "\n"
-
