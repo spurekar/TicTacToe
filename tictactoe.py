@@ -2,6 +2,7 @@
 import array
 import string
 
+
 #This function draws a board given the value of each cell
 def print_board(board):
 	print "This is the current board:\n"
@@ -70,18 +71,19 @@ def comp_move(board,compicon):
 	#init vars
 	optscore = -1
 	optcell = 0
-	curplayer = compicon
 
 	#find most optimal cell and score
-	(optcell) = best_move(board,optscore,optcell,curplayer,compicon)
+	(optcell,optscore) = best_move(board,compicon)
 
 	#return most optimal move
-	return int(optcell)
+	return optcell
 
 
 #Recursive function (minimax)
-def best_move(board,optscore,optcell,curplayer,compicon):
-	
+def best_move(board,curplayer):
+
+	cell = 0
+
 	#check for a winner
 	winner = check_win(board)
 	board_full = full_board(board)
@@ -92,42 +94,48 @@ def best_move(board,optscore,optcell,curplayer,compicon):
 		#there's a tie
 			score = 0
 		else:
+			scoresarray = []
 			#try each remaining cell in order
-			
 			for i in range(1,10):
 				#temporarily fill in empty cells
 				if (board[i] == ' '):
 					board[i] = curplayer
-				#(cell,score) = best_move(board,optscore,optcell,curplayer,compicon)
+				
+				#change player
+				if(curplayer == 'O'):
+					curplayer = 'X'
+				else:
+					curplayer = 'O'
+				
+				print_board(board)
+				score = best_move(board,curplayer)
 			
-				#evaluate score?
+				#create array of cells and scores
+				scoresarray.append(i,-score)
+				
+				print "AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
+				sleep(1)
 
 				#clear temp cell
 				board[i] = ' '
 
-			#change player
-			if(curplayer == 'O'):
-				curplayer = 'X'
-			else:
-				curplayer = 'O'
 
-			
+			#find optimal in array
+			optscore = -1
+			for i in scoresarray:
+				if (scoresarray[i][1] >= optscore):
+					optscore = scoresarray[i][1]
+					cell = scoresarray[i][0]	
+			return (cell,optscore)
 
-	#the winner is opponent
-	elif(winner != curplayer and winner != ' '):
-		if(winner == compicon):
-			score = -1
-		else:
-			score = 1
 	#the winner is me
+	elif(winner == curplayer):
+		score = 1
+	#the winner is opponent
 	else:
-		if(winner == compicon):
-			score = 1
-		else:
-			score = -1
+		score = -1
 
-	return optcell
-
+	return (cell,score)
 
 #This function returns an empty cell if possible, otherwise indicates a full board
 def full_board(board):
