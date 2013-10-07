@@ -24,7 +24,7 @@ def Test_FullBoard():
 	curplayer = 'X'
 
 	#Find best move
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 
 	#Make sure board returned is correct
 	assert(score == 1)
@@ -32,7 +32,7 @@ def Test_FullBoard():
 
 	#Make sure player lost
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	assert(score == -1)
 	assert(cell == 0)
 
@@ -42,12 +42,12 @@ def Test_FullBoard():
 
 	#Make sure both players return tie
 	curplayer = 'X'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	assert(score == 0)
 	assert(cell == 0)
 	
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	assert(score == 0)
 	assert(cell == 0)
 
@@ -60,7 +60,7 @@ def Test_OneMove():
 	
 	#Determine current player
 	curplayer = 'X'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 8)
 
@@ -84,13 +84,13 @@ def Test_TwoMoves():
 
 	#Determine current player
 	curplayer = 'X'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 8)
 	assert(score == 1)
 
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 9)
 	assert(score == 1)
@@ -101,7 +101,7 @@ def Test_TwoMoves():
 
 	#Determine current player
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 7)
 	assert(score == 1)
@@ -112,14 +112,14 @@ def Test_TwoMoves():
 
 	#Determine current player
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 6)
 	assert(score == 1)
 
 	#Determine current player
 	curplayer = 'X'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 4)
 	assert(score == 1)
@@ -130,15 +130,22 @@ def Test_TwoMoves():
 
 	#Determine current player
 	curplayer = 'O'
-	(cell,score) = best_move(board,curplayer,curplayer,0)
+	(cell,score) = best_move(board,curplayer)
 	print "The cell is " + str(cell)
 	assert(cell == 6)
 	assert(score == 1)
 
 def Test_SpecTest():
 	#Create board
-	board = [' ','X','X','O','O','X','O','X',' ',' ']
+	board = [' ','X','O','X','O','X','O',' ',' ',' ']
 	print_board(board)
+
+	curplayer = 'O'
+	(cell,score) = best_move(board,curplayer)
+	print "The cell is " + str(cell)
+	assert(cell == 7)
+	assert(score == -1)
+
 
 ###########################################################
 
@@ -207,16 +214,16 @@ def comp_move(board,compicon):
 	curplayer = compicon
 
 	#find most optimal cell and score
-	(optcell,optscore) = best_move(board,curplayer,compicon,depth)
+	(optcell,optscore) = best_move(board,curplayer)
 
 	#return most optimal move
 	return optcell
 
 #Recursive function (minimax)
-def best_move(board,curplayer,compicon,depth):
+def best_move(board,curplayer):
 
 	move = 0
-	score = -1
+	score = -2
 
 	#check for a winner
 	winner = check_win(board)
@@ -236,38 +243,34 @@ def best_move(board,curplayer,compicon,depth):
 				#create array of cells to play in
 				posscells.append(i)
 
-		#handle alpha-beta pruning
-		if curplayer == compicon:
-			score = -1
-		else:
-			score = 1
-
-		
+		#consider each empty cell
 		for cell in posscells:
+			#play in candidate cell
 			board[cell]=curplayer
+
+			#figure out who the other player is
 			if curplayer == 'X':
 				opponent = 'O'
 			else:
 				opponent = 'X'
 		
-			(tempcell,tempscore) = best_move(board,opponent,compicon,depth+1)
+			#calculate the best possible move the opponent can make
+			(tempcell,tempscore) = best_move(board,opponent)
 			tempscore = tempscore*(-1)
-			
-			if (curplayer == compicon):
-				if (depth == 0 and score <= tempscore):
-					if (move == 0):
-						score = tempscore
-						move = cell
-					elif (score < tempscore):
-						score = tempscore
-						move = cell
-			else:
-				if (score >=tempscore):
-					score = tempscore
-
-			board[cell] = ' '
 	
-	#print "The values returned are " + str(move) + " , " + str(score)
+			#clear candidate cell
+			board[cell] = ' '
+			
+			#dont check other cells if there is a win
+			if(tempscore == 1):
+				return (cell,tempscore)
+			
+			#update best score
+			if (score < tempscore):
+				score = tempscore
+				move = cell
+	
+	#return best score and cell to play in
 	return (move,score)
 
 #This function returns an empty cell if possible, otherwise indicates a full board
@@ -282,10 +285,11 @@ def full_board(board):
 print "#########################################################"
 print "First we run unit tests"
 Run_All_Tests()
+print "Done with unit tests"
 print "#########################################################"
 
 
-
+#create game board
 print "\nWelcome to Tic Tac Toe"
 print "Here is the number for each cell"
 print ("     " + '1' + ' | ' + '2' + ' | ' + '3')
@@ -293,8 +297,6 @@ print "     ---------"
 print ("     " + '4' + ' | ' + '5' + ' | ' + '6')
 print "     ---------"
 print ("     " + '7' + ' | ' + '8' + ' | ' + '9\n')
-
-
 
 
 while True:
@@ -312,6 +314,7 @@ while True:
 	else:
 		print "Invalid input. Try again\n"
 
+#initialize computer and user icons
 if(icon == 'X'):
 	curplayer = 1
 	human = 'X'
@@ -342,15 +345,14 @@ while True:
 
 		print_board(board)
 
-		#Check all combinations for a win
-		done = check_win(board)
-
 	#Check all combinations for a win
 	done = check_win(board)
+
 	#Exit if the game is over
 		#means done has a winner, or there are no blank cells
-	if (done != ' ' or full_board == 0):
+	if (done != ' ' or full_board(board) == 0):
 		break
+
 #Show final board
 print_board(board)
 
